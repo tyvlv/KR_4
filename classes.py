@@ -98,7 +98,7 @@ class HH(Engine):
 
     def get_request(self, search: str, experience=None) -> list:
         """Получает информацию через API"""
-        for page in range(1):
+        for page in range(10):
             params = {
                 'text': f'NAME:{search}',  # Текст фильтра
                 'area': 113,  # Поиск осуществляется по вакансиям в России
@@ -140,7 +140,8 @@ class SuperJob(Engine):
         self.vacancy_list = []
 
     def get_request(self, search: str, experience=None) -> list:
-        for page in range(1):
+        """Получает информацию через API"""
+        for page in range(6):
             params = {
                 'keyword': f'{search}',  # Текст фильтра
                 'page': page,  # Индекс страницы поиска на SJ
@@ -169,7 +170,6 @@ class Vacancy:
     __slots__ = ('name', 'url', 'description', 'salary')
 
     def __init__(self, vacancy: dict):
-
         self.name = vacancy['name']
         self.url = vacancy['url']
         self.description = vacancy['description'].replace('\n', '')
@@ -186,7 +186,6 @@ class Vacancy:
 
     def get_salary(self) -> str:
         """Возвращает зарплату в строковом представлении"""
-
         if self.salary is not None:
 
             if self.salary['from'] != 0 and self.salary['to'] != 0:

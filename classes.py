@@ -5,6 +5,76 @@ from abc import ABC, abstractmethod
 import requests
 
 
+class Connector:
+    """Класс коннектор к файлу"""
+    __data_file = None
+
+    def __init__(self, file_path: str):
+        self.__data_file = file_path
+        self.__connect()
+
+    @property
+    def data_file(self) -> str:
+        return self.__data_file
+
+    @data_file.setter
+    def data_file(self, file_path: str):
+        """Установка файла по указанному пути"""
+        self.__data_file = file_path
+        self.__connect()
+
+    def __connect(self):
+        """Перезаписывает или создает новый пустой файл"""
+        with open(self.__data_file, 'w') as file:
+            json.dump([], file)
+
+    def insert(self, data: list):
+        """Запись данных в файл"""
+        with open(self.__data_file, 'w', encoding='UTF-8') as file:
+            json.dump(data, file, indent=2, ensure_ascii=False)
+
+    def select(self, query: dict) -> list:
+        """
+        Выбор данных из файла с применением фильтрации
+        query содержит словарь, в котором ключ это поле для
+        фильтрации, а значение это искомое значение, например:
+        {'price': 1000}, должно отфильтровать данные по полю price
+        и вернуть все строки, в которых цена 1000
+        """
+        result = []
+        with open(self.__data_file, 'r', encoding='UTF-8') as file:
+            data = json.load(file)
+
+        if not query:
+            return data
+
+        for item in data:
+            if all(item.get(key) == value for key, value in query.items()):
+                result.append(item)
+
+        return result
+
+    def delete(self, query: dict):
+        """
+        Удаление записей из файла, которые соответствуют запрос,
+        как в методе select. Если в query передан пустой словарь, то
+        функция удаления не сработает
+        """
+        if not query:
+            return
+
+        result = []
+        with open(self.__data_file, 'r', encoding='UTF-8') as file:
+            data = json.load(file)
+
+        for item in data:
+            if not all(item.get(key) == value for key, value in query.items()):
+                result.append(item)
+
+        with open(self.__data_file, 'w', encoding='UTF-8') as file:
+            json.dump(result, file, indent=2, ensure_ascii=False)
+
+
 class Engine(ABC):
     @abstractmethod
     def __init__(self):
@@ -15,9 +85,9 @@ class Engine(ABC):
         pass
 
     @staticmethod
-    def get_connector(file_name):
+    def get_connector(file_name: str) -> Connector:
         """ Возвращает экземпляр класса Connector """
-        pass
+        return Connector(file_name)
 
 
 class HH(Engine):
@@ -144,3 +214,5 @@ class SJVacancy(Vacancy):
 
     def __str__(self):
         return f'SJ: {self.name}, зарплата: {self.get_salary()}'
+
+

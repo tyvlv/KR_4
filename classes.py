@@ -96,14 +96,15 @@ class HH(Engine):
     def __init__(self):
         self.vacancy_list = []
 
-    def get_request(self, search: str) -> list:
+    def get_request(self, search: str, experience=None) -> list:
         """Получает информацию через API"""
         for page in range(1):
             params = {
                 'text': f'NAME:{search}',  # Текст фильтра
                 'area': 113,  # Поиск осуществляется по вакансиям в России
                 'page': page,  # Индекс страницы поиска на HH
-                'per_page': 100  # Кол-во вакансий на 1 странице
+                'per_page': 100,  # Кол-во вакансий на 1 странице
+                'experience': experience
             }
             req = requests.get(self.URL, params).json()['items']
             for item in req:
@@ -124,9 +125,9 @@ class HH(Engine):
         info_vacancy = {
             'name': vacancy['name'],
             'url': vacancy['alternate_url'],
-            'description': vacancy['snippet']['responsibility'],
-            'salary': {'from': 0 if vacancy.get('salary') is None else vacancy.get('salary', {}).get('from', 0),
-                       'to': 0 if vacancy.get('salary') is None else vacancy.get('salary', {}).get('to', 0), }
+            'description': '' if vacancy['snippet']['responsibility'] is None else vacancy['snippet']['responsibility'],
+            'salary': {'from': 0 if vacancy.get('salary') is None else 0 if vacancy.get('salary', {}).get('from') is None else vacancy.get('salary', {}).get('from'),
+                       'to': 0 if vacancy.get('salary') is None else 0 if vacancy.get('salary', {}).get('to') is None else vacancy.get('salary', {}).get('to'), }
         }
         return info_vacancy
 
@@ -138,12 +139,13 @@ class SuperJob(Engine):
     def __init__(self):
         self.vacancy_list = []
 
-    def get_request(self, search: str):
+    def get_request(self, search: str, experience=None) -> list:
         for page in range(1):
             params = {
                 'keyword': f'{search}',  # Текст фильтра
-                'page': page,  # Индекс страницы поиска на HH
-                'count': 100  # Кол-во вакансий на 1 странице
+                'page': page,  # Индекс страницы поиска на SJ
+                'count': 100,  # Кол-во вакансий на 1 странице
+                'experience': experience
             }
             req = requests.get(self.URL, headers=self.HEADERS, params=params).json()['objects']
             for item in req:
@@ -177,7 +179,7 @@ class Vacancy:
         return f'Вакансия - {self.name}, заработная плата - {self.get_salary()}'
 
     def __repr__(self):
-        return f'"name": {self.name}\n \
+        return f'\n"name": {self.name}\n \
                "url": {self.url}\n \
                "description": {self.description}\n \
                "salary": {self.salary}'

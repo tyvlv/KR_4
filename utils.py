@@ -1,15 +1,18 @@
 from classes import HHVacancy, SJVacancy
 
 
-def get_vacancies(vacancy_list: list, hh_sj_site: str) -> list[HHVacancy | SJVacancy]:
+def get_vacancies(vacancy_list: list, hh_sj_site: str) -> list[HHVacancy] | list[SJVacancy]:
     """Возвращает экземпляры HHVacancy/SJVacancy"""
-    hh_sj_vacancy_list = []
+    hh_vacancy_list = []
+    sj_vacancy_list = []
+    if hh_sj_site == '1':
+        for vacancy in vacancy_list:
+            hh_vacancy_list.append(HHVacancy(vacancy))
+        return hh_vacancy_list
+
     for vacancy in vacancy_list:
-        if hh_sj_site == '1':
-            hh_sj_vacancy_list.append(HHVacancy(vacancy))
-        elif hh_sj_site == '2':
-            hh_sj_vacancy_list.append(SJVacancy(vacancy))
-    return hh_sj_vacancy_list
+        sj_vacancy_list.append(SJVacancy(vacancy))
+    return sj_vacancy_list
 
 
 def sorting_by_salary(hh_sj_vacancy_list: list) -> list:

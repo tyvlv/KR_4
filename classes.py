@@ -7,14 +7,13 @@ import requests
 
 class Connector:
     """Класс коннектор к файлу"""
-    __data_file = None
 
     def __init__(self, file_path: str):
         self.__data_file = file_path
         self.__connect()
 
     @property
-    def data_file(self) -> str:
+    def data_file(self) -> str | None:
         return self.__data_file
 
     @data_file.setter

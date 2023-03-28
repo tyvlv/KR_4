@@ -1,8 +1,7 @@
-import json
 import os
 import sys
 
-from classes import HH, SuperJob, Vacancy, Engine
+from classes import HH, SuperJob, Engine
 from utils import get_vacancies, sorting_by_salary, get_top_by_salary
 
 
@@ -11,7 +10,7 @@ def main():
     connector = Engine.get_connector(file_path)
 
     while True:
-        print("Где будем искать вакансии:\n1 - HeadHunter\n2 - SuperJob")
+        print("Где будем искать вакансии?\n1 - HeadHunter\n2 - SuperJob")
         hh_sj_site = input()
         if hh_sj_site in ['1', '2']:
             break
@@ -22,7 +21,7 @@ def main():
     search = input()
 
     while True:
-        print("Искать вакансии без опыта работы:\n1 - Да\n2 - Не важно")
+        print("Искать вакансии без опыта работы?\n1 - Да\n2 - Не важно")
         experience = input()
         if experience == '1':
             if hh_sj_site == '1':
@@ -53,7 +52,7 @@ def main():
         sys.exit()
 
     while True:
-        print("Хотите поработать с полученными данными:\n1 - Да\n2 - Нет")
+        print("Хотите поработать с полученными данными?\n1 - Да\n2 - Нет")
         user_choice = input()
         if user_choice == '1':
             vacancy_list_from_file = connector.select({})
@@ -70,18 +69,26 @@ def main():
 1 - Вывести в консоль N вакансий по запросу '{search}'\n\
 2 - Вывести в консоль N вакансий по убыванию зарплаты")
         user_choice_action = input()
-        number_of_vacancies = int(input("Введите количество вакансий N:\n"))
 
         if user_choice_action == '1':
-            print(hh_sj_vacancy_list[:number_of_vacancies])
-            break
+            try:
+                number_of_vacancies = int(input("Введите количество вакансий N:\n"))
+                print(hh_sj_vacancy_list[:number_of_vacancies])
+                break
+            except ValueError:
+                print("Вы ввели не число. Давайте еще раз попробуем...")
+                continue
 
         elif user_choice_action == '2':
-            print(get_top_by_salary(sorting_by_salary(hh_sj_vacancy_list), number_of_vacancies))
-            break
+            try:
+                number_of_vacancies = int(input("Введите количество вакансий N:\n"))
+                print(get_top_by_salary(sorting_by_salary(hh_sj_vacancy_list), number_of_vacancies))
+                break
+            except ValueError:
+                print("Вы ввели не число. Давайте еще раз попробуем...")
+                continue
 
-        else:
-            print("Введите '1' или '2'")
+        print("Введите '1' или '2'")
 
 
 if __name__ == "__main__":
